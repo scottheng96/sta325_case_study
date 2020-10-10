@@ -1,0 +1,34 @@
+---
+title: "case_study_report"
+author: "Connie Wu, Jason McEachin, Joe Choo, Scott Heng"
+date: "10/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(dplyr)
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+data_test <- read.csv(file='data-test.csv')
+data_train <- read.csv(file='data-train.csv')
+``
+
+
+# Introduction
+<!-- outline key research objectives and how your model achieves such objectives -->
+
+# Methodology
+<!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
+
+# Results
+<!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
+
+# Conclusion
+<!-- summarizing key findings of your study -->
+
