@@ -19,7 +19,6 @@ data_test <- read.csv(file='data-test.csv')
 data_train <- read.csv(file='data-train.csv')
 ```
 
-
 # Introduction
 <!-- outline key research objectives and how your model achieves such objectives -->
 
