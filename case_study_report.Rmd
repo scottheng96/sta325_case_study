@@ -12,12 +12,80 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, include=FALSE}
 library(dplyr)
 library(tidyverse)
+library(corrplot)
+library(gridExtra)
+library(reshape2)
+library(MLmetrics)
 ```
 
 ```{r, include=FALSE}
-data_test <- read.csv(file='data-test.csv')
-data_train <- read.csv(file='data-train.csv')
+test <- read.csv(file='data-test.csv')
+train <- read.csv(file='data-train.csv')
 ```
+
+<!-- EDA-->
+
+```{r, include=FALSE}
+#pairs plot to show correlation between response variables
+train_response <- data.frame(train[,c("R_moment_1","R_moment_2","R_moment_3","R_moment_4")])
+pairs(train_response)
+```
+
+```{r, include=FALSE, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center'}
+#plots of each predictor variable with moment 1 (can be changed to other moments)
+st_m1 <- ggplot(train,aes(x=St, y=R_moment_1)) + geom_point()
+re_m1 <- ggplot(train,aes(x=Re, y=R_moment_1)) + geom_point()
+fr_m1 <- ggplot(train,aes(x=Fr, y=R_moment_1)) + geom_point()
+
+gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
+```
+
+```{r, include=FALSE}
+#correlation between predictor variables (in case we need to include interaction effects)
+train_predictors <- data.frame(train[,c("Re","Fr","St")])
+pairs(train_predictors)
+```
+
+<!-- Modelling-->
+
+```{r, include=FALSE}
+#linear regression for each response variable
+train_noinf <- data.frame(train)
+train_noinf[train_noinf == Inf] <- 0
+lm_m1 <- lm(R_moment_1 ~ St + Fr + Re, data=train_noinf)
+lm_m2 <- lm(R_moment_2 ~ St + Fr + Re, data=train_noinf)
+lm_m3 <- lm(R_moment_3 ~ St + Fr + Re, data=train_noinf)
+lm_m4 <- lm(R_moment_4 ~ St + Fr + Re, data=train_noinf)
+
+summary(lm_m1)
+summary(lm_m2)
+summary(lm_m3)
+summary(lm_m4)
+```
+
+```{r, include=FALSE}
+#linear regression (continued)- predictions
+test[test==Inf] <- 0
+p1 <- predict.lm(lm_m1, data=test)
+p2 <- predict.lm(lm_m2, data=test)
+p3 <- predict.lm(lm_m3, data=test)
+p4 <- predict.lm(lm_m4, data=test)
+```
+
+```{r, include=FALSE}
+#linear regression (continued) -interaction effects
+lm_m1_int <- lm(R_moment_1 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
+lm_m2_int <- lm(R_moment_2 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
+lm_m3_int <- lm(R_moment_3 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
+lm_m4_int <- lm(R_moment_4 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
+
+summary(lm_m1_int)
+summary(lm_m2_int)
+summary(lm_m3_int)
+summary(lm_m4_int)
+```
+
+<!-- Paper -->
 
 # Introduction
 <!-- outline key research objectives and how your model achieves such objectives -->
