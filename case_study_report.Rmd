@@ -172,6 +172,64 @@ ridge.pred2 <- predict(ridge.mod2, s = bestlam2, newx = x2[test2,])
 mean((ridge.pred2 - y.test2)^2)
 ```
 
+
+
+```{r ridge model 3 and 4}
+
+x3 <- model.matrix(R_moment_3~St + Fr + Re,data=train_noinf)[,-1]
+y3 <- train_noinf$R_moment_3
+
+
+ridge.mod3 <- glmnet(x3, y3, alpha = 0, lambda = grid)
+
+
+train3 <- sample(1:nrow(x3), nrow(x3)/2)
+test3 <- (-train3)
+y.test3 <- y[test3]
+
+ridge.mod3 <- glmnet(x3[train3,], y3[train3], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred3 <- predict(ridge.mod3, s = 4, newx = x3[test3,])
+mean((ridge.pred3 - y.test3)^2) ## calculate MSE
+
+
+x4 <- model.matrix(R_moment_4~St + Fr + Re,data=train_noinf)[,-1]
+y4 <- train_noinf$R_moment_4
+
+ridge.mod4 <- glmnet(x4, y4, alpha = 0, lambda = grid)
+
+
+train4 <- sample(1:nrow(x4), nrow(x4)/2)
+test4 <- (-train4)
+y.test4 <- y[test4]
+
+ridge.mod4 <- glmnet(x4[train4,], y4[train4], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred4 <- predict(ridge.mod4, s = 4, newx = x4[test4,])
+mean((ridge.pred4 - y.test4)^2) ## calculate MSE
+```
+```{r best lam3 and lam4}
+
+set.seed(1)
+cv.out3 <- cv.glmnet(x3[train3,], y3[train3], alpha = 0)
+plot(cv.out3)
+bestlam3 <- cv.out3$lambda.min
+bestlam3
+
+
+cv.out4 <- cv.glmnet(x4[train4,], y4[train4], alpha = 0)
+plot(cv.out4)
+bestlam4 <- cv.out4$lambda.min
+bestlam4
+```
+```{r ridge3 and ridge4 with best lam}
+ridge.pred3 <- predict(ridge.mod3, s = bestlam3, newx = x3[test3,])
+mean((ridge.pred3 - y.test3)^2)
+
+ridge.pred4 <- predict(ridge.mod4, s = bestlam4, newx = x4[test4,])
+mean((ridge.pred4 - y.test4)^2)
+
+```
+improvement? still large
+
 <!-- Paper -->
 
 # Introduction
