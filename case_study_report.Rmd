@@ -128,12 +128,50 @@ bestlam <- cv.out$lambda.min
 bestlam
 
 ```
+
 ```{r ridge with best lam}
 ridge.pred <- predict(ridge.mod, s = bestlam, newx = x[test,])
 mean((ridge.pred - y.test)^2)
 
-````
+```
 improvment in the mse
+
+
+```{r moment2 ridge}
+x2 <- model.matrix(R_moment_2~ St + Fr + Re,data=train_noinf)[,-1]
+y2 <- train_noinf$R_moment_2 
+
+library(glmnet)
+set.seed(1)
+grid <- 10^seq(10, -2, length = 100) # grid of values for lambda param
+ridge.mod2 <- glmnet(x2, y2, alpha = 0, lambda = grid)
+
+
+train2 <- sample(1:nrow(x2), nrow(x2)/2)
+test2 <- (-train2)
+y.test2 <- y2[test2]
+
+ridge.mod2 <- glmnet(x2[train,], y2[train], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred <- predict(ridge.mod, s = 4, newx = x2[test,])
+mean((ridge.pred - y.test2)^2) ## calculate MSE
+```
+
+
+```{r best lam2}
+
+set.seed(1)
+cv.out2 <- cv.glmnet(x2[train2,], y2[train2], alpha = 0)
+plot(cv.out2)
+bestlam2 <- cv.out2$lambda.min
+bestlam2
+
+```
+
+```{r ridge2 with best lam}
+ridge.pred2 <- predict(ridge.mod2, s = bestlam2, newx = x2[test2,])
+mean((ridge.pred2 - y.test2)^2)
+```
+
 <!-- Paper -->
 
 # Introduction
