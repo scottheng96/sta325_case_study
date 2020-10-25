@@ -25,13 +25,13 @@ train <- read.csv(file='data-train.csv')
 
 <!-- EDA-->
 
-```{r, include=FALSE}
+```{r}
 #pairs plot to show correlation between response variables
 train_response <- data.frame(train[,c("R_moment_1","R_moment_2","R_moment_3","R_moment_4")])
 pairs(train_response)
 ```
 
-```{r, include=FALSE, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center'}
+```{r, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center'}
 #plots of each predictor variable with moment 1 (can be changed to other moments)
 st_m1 <- ggplot(train,aes(x=St, y=R_moment_1)) + geom_point()
 re_m1 <- ggplot(train,aes(x=Re, y=R_moment_1)) + geom_point()
@@ -40,7 +40,7 @@ fr_m1 <- ggplot(train,aes(x=Fr, y=R_moment_1)) + geom_point()
 gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 ```
 
-```{r, include=FALSE}
+```{r}
 #correlation between predictor variables (in case we need to include interaction effects)
 train_predictors <- data.frame(train[,c("Re","Fr","St")])
 pairs(train_predictors)
@@ -85,6 +85,17 @@ summary(lm_m3_int)
 summary(lm_m4_int)
 ```
 
+```{r}
+#linear regression with factored Re and Fr
+train1 <- train
+train1$Re <- as.factor(train$Re)
+train1$Fr <- as.factor(train$Fr)
+lm1_m1 <- lm(R_moment_1 ~ St + Fr + Re, data=train1)
+lm2_m1 <- lm(R_moment_2 ~ St + Fr + Re, data=train1)
+lm3_m1 <- lm(R_moment_3 ~ St + Fr + Re, data=train1)
+lm4_m1 <- lm(R_moment_4 ~ St + Fr + Re, data=train1)
+summary(lm1_m1)
+```
 <!-- Paper -->
 
 # Introduction
