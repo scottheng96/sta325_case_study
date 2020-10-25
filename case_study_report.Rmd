@@ -96,6 +96,44 @@ lm3_m1 <- lm(R_moment_3 ~ St + Fr + Re, data=train1)
 lm4_m1 <- lm(R_moment_4 ~ St + Fr + Re, data=train1)
 summary(lm1_m1)
 ```
+
+
+
+
+```{r moment1 ridge}
+x <- model.matrix(R_moment_1~St + Fr + Re,data=train_noinf)[,-1]
+y <- train_noinf$R_moment_1 
+
+library(glmnet)
+grid <- 10^seq(10, -2, length = 100) # grid of values for lambda param
+ridge.mod <- glmnet(x, y, alpha = 0, lambda = grid)
+
+
+train <- sample(1:nrow(x), nrow(x)/2)
+test <- (-train)
+y.test <- y[test]
+
+ridge.mod <- glmnet(x[train,], y[train], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred <- predict(ridge.mod, s = 4, newx = x[test,])
+mean((ridge.pred - y.test)^2) ## calculate MSE
+```
+
+
+```{r}
+
+set.seed(1)
+cv.out <- cv.glmnet(x[train,], y[train], alpha = 0)
+plot(cv.out)
+bestlam <- cv.out$lambda.min
+bestlam
+
+```
+```{r ridge with best lam}
+ridge.pred <- predict(ridge.mod, s = bestlam, newx = x[test,])
+mean((ridge.pred - y.test)^2)
+
+````
+improvment in the mse
 <!-- Paper -->
 
 # Introduction
@@ -124,6 +162,8 @@ distribution for particle cluster volumes
 
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
+
+
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
