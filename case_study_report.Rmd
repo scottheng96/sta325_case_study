@@ -101,6 +101,21 @@ summary(lm1_m1)
 # Introduction
 <!-- outline key research objectives and how your model achieves such objectives -->
 
+Turbulence is  highly versatile motion that is often times difficult to predict and understanding
+fluid motion and its effect on natural problems poses a great challenge.
+Interpreting turbulence data is an incredibly important task in the engineering
+from understanding the cosmos to the cosmic cycle. 
+
+Parametric modeling is effective when we want to compactly represent features as model
+parameters. Unlike certain “black box” machine learning techniques, it offers a 
+higher level ofinterpretability, which is especially useful for a practical 
+setting.Rather than simply outputting a classification result, a parametric 
+model allows us to investigate in more detail which aspects of turbulence 
+differ between high and low particle cluster volumes.
+
+In our project, we use linear and (...)  and apply it to interpret
+the difference in model parameters in order to achieve the the following objectives:
+
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
 
