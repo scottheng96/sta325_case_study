@@ -116,7 +116,12 @@ Finally, since `Fr` contains values of infinity, we decided to inverse-logit the
 
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
-We fit a linear regression model with interaction effects, taking $Re$ and $Fr.logit$ as factor variables and $St$ as a bounded, continuous variable. Other models were also explored, but they had larger limitations in comparison with the linear model which is discussed further in the report. We implement a linear regression model for each moment, with a total of 4 models for 4 moments.
+
+For the approach to modeling the first moment, we first conducted a simple linear regression with a logit transformation on $Fr$ (this was used to address the $Fr$ points labeled 'Inf') while keeping $Re$ and $St$ the same. However this model had a low R-squared value with a pattern found in the residuals. The next approach was conducted with the addition of interaction terms, and the results were similar: low R-squared value and pattern in the residuals.
+
+Referring back to the exploratory data analysis, we saw that the $Fr.logit$ and $Re$ behaved more like categorical variables with only 3 unique data points for each. Therefore, for the next approach, we made $Fr$ and $Re$ as factors and created a model with both the simple linear regression and the addition of interaction terms. The factored model with interaction terms resulted in the best R-squred value (.982), a low RMSE (.0087), and a more reasonably random residuals plot. The improved summary, error, and model statistics while maintaining the interpretability of the model makes this factored linear regression with interaction terms model especially appealing. 
+ 
+To see if we can find a better model, we also conducted a Ridge Regression and Generalized Additive Model, but these resulted in very high MSE for higher moments.
 
 For our chosen linear regression model, we can write this in statistical notation below:
 
@@ -126,11 +131,14 @@ Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\be
 \text{For }   1 \leq x \leq 4, \\
 \end{aligned}
 $$
-Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
+
+Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthermore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
+
+For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between `Fr` and `Re` to be significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. There Residual Mean-squared Error is 1.237, which is low, meaning that the model is fit well. Holding all else constant, a unit increase in `St` results in a e^(0.8586) increase of the second moment. When `Fr` is 0.574 and 1, there is a e^(-6.678) and e^(-6.737) change of the second moment respectively. Similar when `Re` is 224 and 398, there is a e^(-7.43451) and e^(-10.7873) change of the second moment respectively. Additionally, when `Fr` is 0.574 and `Re` is 224 and 398, there is a e^(4.477) change in the second moment. When `Fr` is 1, and `Re` is 224 and 398, there an additional e^(4.694) and e^(6.883) change in the second moment.
 
 ```{r mom3 final, eval = F}
 set.seed(1)
@@ -156,12 +164,14 @@ model_caret4 <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
-model_caret4
+summary(model_caret4)
 ```
 
+For the fourth moment, we can similarly see that the interaction terms including St are no longer significant, while their main effects are still significant. The Residual standard error is 2.693 which is higher than other models, but is expected since moment 4 is a higher-order derivation of the probability distribution compared to moments 1,2 and 3. However, a high adjusted R-squared value of 0.8784 tells us that the model explains much of the variability in the predictive capabilities of the model, but is significant lower than the other models with lower-order moments. Holding all else constant, a unit increase in `St` causes a e^(1.7147) increase in the 4th moment. When `Fr`= 0.5744 and 1, there is an e^(0.3206) and e^(0.0065) increase in the 4th moment respectively. When `Re` = 224 and 398, there is an e^(0.1384) and e^(-1.3817) increase in the 4th moment respectively. Additionally, when `Fr`=0.5744, and `Re` = 224, there is an additional e^(12.435) increase in the 4th moment. When `Fr` = `, and `Re` = 224 and 398, there is an additional e^(12.719) and e^(19.134) increase in the 4th moment respectively. 
 
 # Conclusion
 <!-- summarizing key findings of your study -->
+
 
 # Appendix
 
@@ -278,7 +288,6 @@ lm1_m1 <- lm(R_moment_1 ~ St + Fr.logit + Re, data=train1)
 lm2_m1 <- lm(R_moment_2 ~ St + Fr.logit + Re, data=train1)
 lm3_m1 <- lm(R_moment_3 ~ St + Fr.logit + Re, data=train1)
 lm4_m1 <- lm(R_moment_4 ~ St + Fr.logit + Re, data=train1)
-summary(lm1_m1_int)
 
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
@@ -490,7 +499,7 @@ mean((preds - y.test)^2)
 lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
 ```
 
-```{r as factor cross validation}
+```{r as factor cross validation1}
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
