@@ -145,7 +145,7 @@ model_caret3
 summary(model_caret3$finalModel)
 ```
 
-For the third moment, we can see that 4 of the interaction terms, the different combinations of `St:Fr.logit` and `St:Re`, are no longer significant compared to their baseline levels, although their main effects are still significant at an alpha level of 0.05. Holding all else constant, 
+For the third moment, we can see that 4 of the interaction terms, the different combinations of `St:Fr.logit` and `St:Re`, are no longer significant compared to their baseline levels, although their main effects are still significant at an alpha level of 0.05. Overall, we can see that individually, `St` has a positive correlation with the third moment, and `Fr.logit` and `Re` have negative correlations with the third moment as they increases from their baseline levels. More specifically, when holding all else constant and given `Fr.logit` and `Re` are at their respective baseline levels of 0.51 and 90, we can see that increasing `St` by one unit will increase the third moment by a multiplicative factor of $e^{0.022}$, or by 1.022 times. We can also see that when `Fr.logit` is at the baseline level of 0.51, `St` is 1, and `Re` increases from its baseline level of 90 to 224, the third moment increases by a multiplicative factor of $e^{-11.09-0.07}$, or by 0.000014 times. Finally, when `Re` is at the baseline level of 90, `St` is 1, and `Fr.logit` increases from its baseline level of 0.51 to 0.57, the third moment increases by a multiplicative factor of $e^{-12.81+0.299}$, or by 0.0000037 times. The RMSE of this model using 5-fold cross validation was 2.13, whereas the R-squared was 0.86, both of which indicate that we are fitting the training data relatively well. 
 
 ```{r mom4 final, eval = F}
 set.seed(1)
