@@ -106,13 +106,27 @@ Performing some exploratory data analysis, we can observe from Figure 1 that $St
 
 ```{r, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center', fig.cap="Exploratory data analysis plots on predictors vs first moment"}
 #plots of each predictor variable with moment 1 (can be changed to other moments)
+st_m1 <- ggplot(train,aes(x=St, y=R_moment_1)) + geom_point()
+re_m1 <- ggplot(train,aes(x=Re, y=R_moment_1)) + geom_point()
+fr_m1 <- ggplot(train,aes(x=Fr, y=R_moment_1)) + geom_point()
 gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 ```
 
+Finally, since `Fr` contains values of infinity, we decided to inverse-logit the variable, thus creating a new variable called `Fr.logit`. We use this new variable in our models so as to decrease the originally broad range of `Fr` and improve our predictions.
 
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
+We fit a linear regression model with interaction effects, taking $Re$ and $Fr.logit$ as factor variables and $St$ as a bounded, continuous variable. Other models were also explored, but they had larger limitations in comparison with the linear model which is discussed further in the report. We implement a linear regression model for each moment, with a total of 4 models for 4 moments.
 
+For our chosen linear regression model, we can write this in statistical notation below:
+
+$$
+\begin{aligned}
+Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\beta_j*Fr.logit_j \\ + \sum_{k=8}^{10}\beta_k *\text{(all two-way interactions between St, Re and Fr.logit)} \\
+\text{For }   1 \leq x \leq 4, \\
+\end{aligned}
+$$
+Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
 
 # Results
@@ -122,25 +136,27 @@ gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
-model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+model_caret3 <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
                      trControl = data_ctrl,              # folds
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
-model_caret
-summary(model_caret$finalModel)
+model_caret3
+summary(model_caret3$finalModel)
 ```
-For the third moment, we $log$ the response variable as well so that it is scaled it properly to the same 
+
+For the third moment, we can see that 4 of the interaction terms, the different combinations of `St:Fr.logit` and `St:Re`, are no longer significant compared to their baseline levels, although their main effects are still significant at an alpha level of 0.05. Holding all else constant, 
+
 ```{r mom4 final, eval = F}
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
-model_caret <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+model_caret4 <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                      
                      trControl = data_ctrl,              # folds
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
-model_caret
+model_caret4
 ```
 
 
