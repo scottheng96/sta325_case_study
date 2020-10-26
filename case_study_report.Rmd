@@ -151,6 +151,7 @@ model_caret3 <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re
 
 model_caret3
 summary(model_caret3$finalModel)
+confint(model_caret3$finalModel, level=0.95)
 ```
 
 For the third moment, we can see that 4 of the interaction terms, the different combinations of `St:Fr.logit` and `St:Re`, are no longer significant compared to their baseline levels, although their main effects are still significant at an alpha level of 0.05. Holding all else constant, 
@@ -165,13 +166,13 @@ model_caret4 <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re
                      na.action = na.pass)
 
 summary(model_caret4)
+confint(model_caret4$finalModel, level=0.95)
 ```
 
 For the fourth moment, we can similarly see that the interaction terms including St are no longer significant, while their main effects are still significant. The Residual standard error is 2.693 which is higher than other models, but is expected since moment 4 is a higher-order derivation of the probability distribution compared to moments 1,2 and 3. However, a high adjusted R-squared value of 0.8784 tells us that the model explains much of the variability in the predictive capabilities of the model, but is significant lower than the other models with lower-order moments. Holding all else constant, a unit increase in `St` causes a e^(1.7147) increase in the 4th moment. When `Fr`= 0.5744 and 1, there is an e^(0.3206) and e^(0.0065) increase in the 4th moment respectively. When `Re` = 224 and 398, there is an e^(0.1384) and e^(-1.3817) increase in the 4th moment respectively. Additionally, when `Fr`=0.5744, and `Re` = 224, there is an additional e^(12.435) increase in the 4th moment. When `Fr` = `, and `Re` = 224 and 398, there is an additional e^(12.719) and e^(19.134) increase in the 4th moment respectively. 
 
 # Conclusion
 <!-- summarizing key findings of your study -->
-
 
 # Appendix
 
@@ -314,6 +315,7 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
 model_caret
 plot(model_caret$finalModel)
 summary(model_caret$finalModel)
+confint(model_caret$finalModel, level=0.95)
 
 
 model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
@@ -324,7 +326,7 @@ model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*R
 model_caret_2
 plot(model_caret_2$finalModel)
 summary(model_caret_2$finalModel)
-
+confint(model_caret_2$finalModel, level=0.95)
 ```
 
 The model’s coefficients are all negative except the St and Fr.logit:Re 
