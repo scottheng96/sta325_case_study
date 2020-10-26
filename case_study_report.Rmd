@@ -1,12 +1,12 @@
 ---
-title: "case_study_report"
+title: "Trouble with Turbulence"
 author: "Connie Wu, Jason McEachin, Joe Choo, Scott Heng"
 date: "10/10/2020"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r, include=FALSE}
@@ -50,11 +50,11 @@ from understanding the cosmos to the cosmic cycle.
 Parametric modeling is effective when we want to compactly represent features as model
 parameters. Unlike certain “black box” machine learning techniques, it offers a 
 higher level of interpretability, which is especially useful for a practical 
-setting.Rather than simply outputting a classification result, a parametric 
+setting. Rather than simply outputting a classification result, a parametric 
 model allows us to investigate in more detail which aspects of turbulence 
 differ between high and low particle cluster volumes.
 
-In our project, we use linear and (...)  and apply it to interpret
+In our project, we use linear regression and apply it to interpret
 the difference in model parameters in order to achieve the the following objectives:
 
 1. Build a model that predict its particle cluster volume distribution in terms 
@@ -134,7 +134,7 @@ $$
 
 Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthermore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
-In order to validate our models and evaluate which performed the best out of all of the ones we tried in the Appendix, we performed 5-fold cross validation  
+In order to validate our models and evaluate which performed the best out of all of the ones we tried in the Appendix, we performed 5-fold cross validation using the package `caret`. We interpreted a low RMSE and a high R-squared value to indicate that the model fit well to the data. We will talk more about these two values in the Results section for each model.
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
@@ -153,9 +153,11 @@ summary(model_caret$finalModel)
 confint(model_caret$finalModel, level=0.95)
 ```
 
-The model’s coefficients align with our prior beliefs. A larger particle size could increase the probability distribution for particle cluster volumes. Further, the coefficients of significance are `St`, `Re` and their interaction. For every increase one unit increase in `St`, we expect that the first moment will increase by 0.024313. From this positive value we can conclude that the per probability distribution is increasing as we increase particle size. When `Fr`= 0.5744 and 1, there is a -0.035778 and -0.038679 increase in the first moment. When `Re` = 224 and 398, there is an 0.103060 and -0.106710 increase in the first moment. When `Fr`=0.5744, and `Re` = 224 there is an 0.028831 increase in the first moment. When `Fr` = 1, and `Re` = 224 and 398, there is a 0.033657 and 0.034294 increase in the first moment. The R-squared value of 0.9892 shows the factors in the model successfully explain the most of the variance. The residual standard error is 0.006253 which is the lowest among the models as to be expected as the others have been derived from this model.
+The model’s coefficients align with our prior beliefs. A larger particle size could increase the probability distribution for particle cluster volumes. Further, the coefficients of significance are `St`, `Re` and their interaction. For every increase one unit increase in `St`, we expect that the first moment will increase by 0.024313. From this positive value we can conclude that the per probability distribution is increasing as we increase particle size. When `Fr`= 0.5744 and 1, there is a -0.035778 and -0.038679 increase in the first moment. When `Re` = 224 and 398, there is an 0.103060 and -0.106710 increase in the first moment. When `Fr`=0.5744, and `Re` = 224 there is an 0.028831 increase in the first moment. When `Fr` = 1, and `Re` = 224 and 398, there is a 0.033657 and 0.034294 increase in the first moment. The R-squared value of 0.9892 shows the factors in the model successfully explain the most of the variance. The root mean square error (RMSE) is 0.006253 which is the lowest among the models, as can be expected since the others have been derived from this model.
 
 It is important to note that there are NA's in the row representing the interaction between `Fr.logit` with a value of 0.574 and `Re` with a value of 398. This is because there are no combinations of these two categorical variables in the dataset, and as a result, there is no data to determine the coefficient for this interaction. However, we chose to keep this interaction because the other interactions between `Fr.logit` and `Re` are significant compared to the baseline.
+
+We have plotted the model diagnostics for this model in the Appendix. Although the residuals seem to be clustered at the left end of the plot in the Residuals vs. Fitted plot, they do seem to be randomly distributed around the 0 line. Additionally, the QQ-plot seems to follow the diagonal line mostly well except at the ends, but this is not a huge concern. Finally, there seems to be 3 points of high leverage, which would be interesting to look into in future studies.
 
 ```{r mom2 final, eval = F}
 set.seed(1)
@@ -171,7 +173,7 @@ summary(model_caret2$finalModel)
 confint(model_caret2$finalModel, level=0.95)
 ```
 
-For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between `Fr` and `Re` are significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. The residual mean-squared error calculated from 5-fold cross validation is 1.33 and the R-squared is 0.852, indicating that the model is fit well to the data. Holding all else constant, a unit increase in `St` results in a $e^{0.8586}$ multiplicative increase of the second moment. When `Fr` is 0.574 and 1, there is a $e^{-6.678}$ and $e^{-6.737}$ change of the second moment respectively. Similar when `Re` is 224 and 398, there is a $e^{-7.43451}$ and $e^{-10.7873}$ change of the second moment respectively. Additionally, when `Fr` is 0.574 and `Re` is 224 and 398, there is a $e^{4.477}$ change in the second moment. When `Fr` is 1, and `Re` is 224 and 398, there an additional $e^{4.694}$ and $e^{6.883}$ change in the second moment.
+For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between `Fr` and `Re` are significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. The RMSE calculated from 5-fold cross validation is 1.33 and the R-squared is 0.852, indicating that the model is fit well to the data. Holding all else constant, a unit increase in `St` results in a $e^{0.8586}$ multiplicative increase of the second moment. When `Fr` is 0.574 and 1, there is a $e^{-6.678}$ and $e^{-6.737}$ change of the second moment respectively. Similar when `Re` is 224 and 398, there is a $e^{-7.43451}$ and $e^{-10.7873}$ change of the second moment respectively. Additionally, when `Fr` is 0.574 and `Re` is 224 and 398, there is a $e^{4.477}$ change in the second moment. When `Fr` is 1, and `Re` is 224 and 398, there an additional $e^{4.694}$ and $e^{6.883}$ change in the second moment.
 
 ```{r mom3 final, eval = F}
 set.seed(1)
@@ -203,7 +205,7 @@ summary(model_caret4)
 confint(model_caret4$finalModel, level=0.95)
 ```
 
-For the fourth moment, we can similarly see that the interaction terms including `St` are no longer significant, while their main effects are still significant. The residual standard error is 2.693, which is higher than other models, but is expected since moment 4 is a higher-order derivation of the probability distribution compared to moments 1, 2 and 3. However, a high adjusted R-squared value of 0.8784 tells us that the model explains much of the variability in the predictive capabilities of the model, but is significant lower than the other models with lower-order moments. Holding all else constant, a unit increase in `St` causes a e^(1.7147) increase in the 4th moment. When `Fr`= 0.5744 and 1, there is an $e^{0.3206}$ and $e^{0.0065}$ increase in the 4th moment respectively. When `Re` = 224 and 398, there is an e^(0.1384) and e^(-1.3817) increase in the 4th moment respectively. Additionally, when `Fr`=0.5744, and `Re` = 224, there is an additional e^(12.435) increase in the 4th moment. When `Fr` = 1, and `Re` = 224 and 398, there is an additional $e^{12.719}$ and $e^{19.134}$ increase in the 4th moment respectively. The RMSE of this model using 5-fold cross validation is 2.94, whereas the R-squared is 0.85, both of which indicate that we are fitting the training data relatively well. 
+For the fourth moment, we can similarly see that the interaction terms including `St` are no longer significant, while their main effects are still significant. The residual standard error is 2.693, which is higher than other models, but is expected since moment 4 is a higher-order derivation of the probability distribution compared to moments 1, 2 and 3. However, a high adjusted R-squared value of 0.8784 tells us that the model explains much of the variability in the predictive capabilities of the model, but is significant lower than the other models with lower-order moments. Holding all else constant, a unit increase in `St` causes a $e^{1.7147}$ increase in the 4th moment. When `Fr`= 0.5744 and 1, there is an $e^{0.3206}$ and $e^{0.0065}$ increase in the 4th moment respectively. When `Re` = 224 and 398, there is an $e^{0.1384}$ and $e^{-1.3817}$ increase in the 4th moment respectively. Additionally, when `Fr`=0.5744, and `Re` = 224, there is an additional $e^{12.435}$ increase in the 4th moment. When `Fr` = 1, and `Re` = 224 and 398, there is an additional $e^{12.719}$ and $e^{19.134}$ increase in the 4th moment respectively. The RMSE of this model using 5-fold cross validation is 2.94, whereas the R-squared is 0.85, both of which indicate that we are fitting the training data relatively well. 
 
 # Conclusion
 <!-- summarizing key findings of your study -->
@@ -211,7 +213,7 @@ Using linear regression model, we see that there is a good fit with the data aft
 
 There are high levels of uncertainty with our models, as seen from the confidence intervals (seen in the appendix). For the majority of the predictors and their interaction effects, we see a wide range in their 95% confidence intervals, which we can interpret as the model having high degrees of predictive uncertainty. This can be attributed firstly to the limited number of observations in the data set, as well as the derivative nature of the response variables. 
 
-We attempted other models (ridge regression and regressions with higher-polynomials), but concluded that they did not fit as well as the linear regression with interactions and log transformations of the response variables. Ultimately, considering the nature of the study, the types of predictors and the response variables, along with the limited number of observations in the data set, using a linear model with acute modeling decisions was the best fit for the study and provided the best predictive accuracies overall.
+We attempted other models (ridge regression and regressions with higher-polynomials), but concluded that they did not fit as well as the linear regression with interactions and log transformations of the response variables. Ultimately, considering the nature of the study, the types of predictors and the response variables, along with the limited number of observations in the data set, using a linear model with acute modeling decisions was the best fit for the study and provided the best predictive accuracies overall. It is important to note that this study does not include interpretations on particle clustering probability distributions nor turbulence, but the moments that are derived from the distribution. Further manipulations are required to obtain interpretative results for these features.
 
 # Appendix
 
@@ -239,6 +241,7 @@ pairs(train_predictors)
 ```
 
 ### Modeling
+
 
 #### Simple linear modeling
 ```{r, include=FALSE}
@@ -272,11 +275,6 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re, data=train,
 model_caret
 plot(model_caret$finalModel)
 ```
-
-
-
-
-
 
 #### Interaction effects
 
@@ -315,8 +313,6 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
 summary(model_caret)
 ```
 
-
-
 #### Predictors as factors
 
 ```{r}
@@ -343,8 +339,10 @@ lm3_m1_int <- lm(R_moment_3 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logi
 lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
 ```
 
+### Final Models
 ```{r as factor cross validation}
 set.seed(1)
+# moment 1
 data_ctrl <- trainControl(method = "cv", number = 5)
 model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
                      trControl = data_ctrl,              # folds
@@ -353,19 +351,41 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
 
 model_caret
 plot(model_caret$finalModel)
-summary(model_caret$finalModel)
-confint(model_caret$finalModel, level=0.95)
+kable(summary(model_caret$finalModel)$coefficients)
+kable(confint(model_caret$finalModel, level=0.95))
 
-
-model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+# moment 2
+model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                     
                      trControl = data_ctrl,              # folds
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
 model_caret_2
 plot(model_caret_2$finalModel)
-summary(model_caret_2$finalModel)
-confint(model_caret_2$finalModel, level=0.95)
+kable(summary(model_caret_2$finalModel)$coefficients)
+kable(confint(model_caret_2$finalModel, level=0.95))
+
+# moment 3
+model_caret_3 <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                     
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret_3
+plot(model_caret_3$finalModel)
+kable(summary(model_caret_3$finalModel)$coefficients)
+kable(confint(model_caret_3$finalModel, level=0.95))
+
+# moment 4
+model_caret_4 <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                     
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret_4
+plot(model_caret_4$finalModel)
+kable(summary(model_caret_4$finalModel)$coefficients)
+kable(confint(model_caret_4$finalModel, level=0.95))
 ```
 
 #### Ridge Regression 
@@ -513,8 +533,6 @@ preds <- predict(gam2, newdata = as.data.frame(x[test,]))
 mean((preds - y.test)^2)
 ```
 
-#### Fourth moment
-
 ```{r fourth moment gam}
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
@@ -525,22 +543,3 @@ gam4 <- lm(R_moment_4 ~ ns(St, 2) + ns(Re, 2) + ns(Fr.logit, 2), data = train, s
 preds <- predict(gam4, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
 ```
-
-```{r}
-lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
-```
-
-```{r as factor cross validation1}
-set.seed(1)
-
-data_ctrl <- trainControl(method = "cv", number = 5)
-model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
-                     trControl = data_ctrl,              # folds
-                     method = "lm",                      # specifying regression model
-                     na.action = na.pass)
-
-model_caret
-# plot(model_caret$finalModel)
-# summary(model_caret$finalModel)
-```
-
