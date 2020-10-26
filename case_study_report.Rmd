@@ -173,6 +173,11 @@ For the fourth moment, we can similarly see that the interaction terms including
 
 # Conclusion
 <!-- summarizing key findings of your study -->
+Using linear regression model, we see that there is a good fit with the data after treating `Fr` and `Re` as factors, as well as considering log transformations for higher-order moments. There is however, a decrease in the adjusted R-squared values as models are fit with higher-order moments, signifying that using a linear model to predict moments of a probability distribution decreases as the order increases. We can also conclude that `St`, `Re` and `Fr` are all significant in predicting moments up to the 4th derivative, along with their interaction effects with the exception of `St`. 
+
+There are high levels of uncertainty with our models, as seen from the confidence intervals (seen in the appendix). For the majority of the predictors and their interaction effects, we see a wide range in their 95% confidence intervals, which we can interpret as the model having high degrees of predictive uncertainty. This can be attributed firstly to the limited number of observations in the data set, as well as the derivative nature of the response variables. 
+
+We attempted other models (ridge regression and regressions with higher-polynomials), but concluded that they did not fit as well as the linear regression with interactions and log transformations of the response variables. Ultimately, considering the nature of the study, the types of predictors and the response variables, along with the limited number of observations in the data set, using a linear model with acute modeling decisions was the best fit for the study and provided the best predictive accuracies overall.
 
 # Appendix
 
