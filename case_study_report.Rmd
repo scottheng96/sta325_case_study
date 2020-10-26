@@ -138,6 +138,8 @@ Considering the nature of our response variables, since each moment is derived f
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
 
+We can see that there are NA's in the row representing the interaction between `Fr.logit` with a value of 0.574 and `Re` with a value of 398. This is because there are no combinations of these two categorical variables in the dataset, and as a result, there is no data to determine the coefficient for this interaction. 
+
 For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between `Fr` and `Re` to be significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. There Residual Mean-squared Error is 1.237, which is low, meaning that the model is fit well. Holding all else constant, a unit increase in `St` results in a e^(0.8586) increase of the second moment. When `Fr` is 0.574 and 1, there is a e^(-6.678) and e^(-6.737) change of the second moment respectively. Similar when `Re` is 224 and 398, there is a e^(-7.43451) and e^(-10.7873) change of the second moment respectively. Additionally, when `Fr` is 0.574 and `Re` is 224 and 398, there is a e^(4.477) change in the second moment. When `Fr` is 1, and `Re` is 224 and 398, there an additional e^(4.694) and e^(6.883) change in the second moment.
 
 ```{r mom3 final, eval = F}
