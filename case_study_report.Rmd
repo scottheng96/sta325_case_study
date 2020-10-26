@@ -194,7 +194,7 @@ mean((preds - y.test)^2)
 #### Predictors as factors
 
 ```{r}
-#linear regression with factored Re and Fr
+#linear regression with factored Re and Fr.logit
 train1 <- train
 train1$Re <- as.factor(train$Re)
 train1$Fr.logit <- as.factor(train$Fr.logit)
@@ -247,8 +247,8 @@ mean((ridge.pred - y.test)^2)
 MSE stays basically the same
 
 ```{r moment2 ridge}
-x2 <- model.matrix(R_moment_2~ St + Fr + Re + poly(St,2) + poly(Fr,2) + poly(Re,2) + St:Re,data=train_noinf)[,-1]
-y2 <- train_noinf$R_moment_2 
+x2 <- model.matrix(R_moment_2~ St + Fr.logit + Re + poly(St,2) + poly(Fr.logit,2) + poly(Re,2) + St:Re,data=train)[,-1]
+y2 <- train$R_moment_2 
 
 set.seed(17)
 train2 <- sample(1:nrow(x2), 4 * nrow(x2)/5)
@@ -277,8 +277,8 @@ mean((ridge.pred2 - y.test2)^2)
 ```
 
 ```{r ridge model 3}
-x3 <- model.matrix(R_moment_3~St + Fr + Re,data=train_noinf)[,-1]
-y3 <- train_noinf$R_moment_3
+x3 <- model.matrix(R_moment_3~St + Fr.logit + Re,data=train)[,-1]
+y3 <- train$R_moment_3
 
 set.seed(17)
 train3 <- sample(1:nrow(x3), nrow(x3)/2)
@@ -304,8 +304,8 @@ mean((ridge.pred3 - y.test3)^2)
 ```
 
 ```{r ridge model 4}
-x4 <- model.matrix(R_moment_4~as.factor(St) + as.factor(Fr) + as.factor(Re),data=train_noinf)[,-1]
-y4 <- train_noinf$R_moment_4
+x4 <- model.matrix(R_moment_4~as.factor(St) + as.factor(Fr.logit) + as.factor(Re),data=train)[,-1]
+y4 <- train$R_moment_4
 
 set.seed(17)
 train4 <- sample(1:nrow(x4), nrow(x4)/2)
