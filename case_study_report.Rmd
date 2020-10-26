@@ -102,17 +102,31 @@ Performing some exploratory data analysis, we can observe from Figure 1 that $St
 
 ```{r, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center', fig.cap="Exploratory data analysis plots on predictors vs first moment"}
 #plots of each predictor variable with moment 1 (can be changed to other moments)
+st_m1 <- ggplot(train,aes(x=St, y=R_moment_1)) + geom_point()
+re_m1 <- ggplot(train,aes(x=Re, y=R_moment_1)) + geom_point()
+fr_m1 <- ggplot(train,aes(x=Fr, y=R_moment_1)) + geom_point()
 gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 ```
 
-
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
+We fit a linear regression model with interaction effects, taking $Re$ and $Fr$ as factor variables and $St$ as a bounded, continuous variable. Other models were also explored, but they had larger limitations in comparison with the linear model which is discussed further in the report. We implement a linear regression model for each moment, with a total of 4 models for 4 moments. The baseline for each of the models references $Moment_i$ derived by St=1, Re=224 and Fr=0.052. 
 
+For our chosen linear regression model, we can write this in statistical notation below:
+
+$$
+\begin{aligned}
+Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\beta_j*Fr_j \\ + \sum_{k=8}^{10}\beta_k *\text{(all two-way interactions between St, Re and Fr)} \\
+\text{For }   1 \leq x \leq 4, \\
+\end{aligned}
+$$
+Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. 
 
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
+
+
 
 # Conclusion
 <!-- summarizing key findings of your study -->
