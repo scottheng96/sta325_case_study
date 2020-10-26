@@ -29,6 +29,10 @@ test <- read.csv(file='data-test.csv')
 train <- read.csv(file='data-train.csv')
 train$Fr.logit <- inv.logit(train$Fr)
 test$Fr.logit <- inv.logit(test$Fr)
+
+train1 <- train
+train1$Re <- as.factor(train$Re)
+train1$Fr.logit <- as.factor(train$Fr.logit)
 ```
 
 <!-- Paper -->
@@ -108,24 +112,52 @@ fr_m1 <- ggplot(train,aes(x=Fr, y=R_moment_1)) + geom_point()
 gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 ```
 
+Finally, since `Fr` contains values of infinity, we decided to inverse-logit the variable, thus creating a new variable called `Fr.logit`. We use this new variable in our models so as to decrease the originally broad range of `Fr` and improve our predictions.
+
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
-We fit a linear regression model with interaction effects, taking $Re$ and $Fr$ as factor variables and $St$ as a bounded, continuous variable. Other models were also explored, but they had larger limitations in comparison with the linear model which is discussed further in the report. We implement a linear regression model for each moment, with a total of 4 models for 4 moments. The baseline for each of the models references $Moment_i$ derived by St=1, Re=224 and Fr=0.052. 
+We fit a linear regression model with interaction effects, taking $Re$ and $Fr.logit$ as factor variables and $St$ as a bounded, continuous variable. Other models were also explored, but they had larger limitations in comparison with the linear model which is discussed further in the report. We implement a linear regression model for each moment, with a total of 4 models for 4 moments.
 
 For our chosen linear regression model, we can write this in statistical notation below:
 
 $$
 \begin{aligned}
-Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\beta_j*Fr_j \\ + \sum_{k=8}^{10}\beta_k *\text{(all two-way interactions between St, Re and Fr)} \\
+Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\beta_j*Fr.logit_j \\ + \sum_{k=8}^{10}\beta_k *\text{(all two-way interactions between St, Re and Fr.logit)} \\
 \text{For }   1 \leq x \leq 4, \\
 \end{aligned}
 $$
-Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. 
+Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
 
+```{r mom3 final, eval = F}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret3 <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret3
+summary(model_caret3$finalModel)
+```
+
+For the third moment, we can see that 4 of the interaction terms, the different combinations of `St:Fr.logit` and `St:Re`, are no longer significant compared to their baseline levels, although their main effects are still significant at an alpha level of 0.05. Holding all else constant, 
+
+```{r mom4 final, eval = F}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret4 <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                      
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret4
+```
 
 
 # Conclusion
@@ -443,14 +475,32 @@ mean((preds - y.test)^2)
 
 #### Fourth moment
 
-```{r second moment gam pt2}
+```{r fourth moment gam}
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
 test <- (-train.samp)
-y.test <- train$R_moment_2[test]
+y.test <- train$R_moment_4[test]
 
 gam4 <- lm(R_moment_4 ~ ns(St, 2) + ns(Re, 2) + ns(Fr.logit, 2), data = train, subset = train.samp)
 preds <- predict(gam4, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
+```
+
+```{r}
+lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
+```
+
+```{r as factor cross validation}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+# plot(model_caret$finalModel)
+# summary(model_caret$finalModel)
 ```
 
