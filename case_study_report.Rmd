@@ -118,7 +118,7 @@ gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
 
-```{r mom3 final}
+```{r mom3 final, eval = F}
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
@@ -128,22 +128,19 @@ model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re 
                      na.action = na.pass)
 
 model_caret
-plot(model_caret$finalModel)
 summary(model_caret$finalModel)
 ```
-
-```{r mom4 final}
+For the third moment, we $log$ the response variable as well so that it is scaled it properly to the same 
+```{r mom4 final, eval = F}
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
-model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+model_caret <- train(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
                      trControl = data_ctrl,              # folds
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
 model_caret
-# plot(model_caret$finalModel)
-# summary(model_caret$finalModel)
 ```
 
 
@@ -286,6 +283,16 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
 model_caret
 plot(model_caret$finalModel)
 summary(model_caret$finalModel)
+
+
+model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret_2
+plot(model_caret_2$finalModel)
+summary(model_caret_2$finalModel)
 ```
 
 #### Ridge Regression 
@@ -433,6 +440,8 @@ preds <- predict(gam2, newdata = as.data.frame(x[test,]))
 mean((preds - y.test)^2)
 ```
 
+#### Fourth moment
+
 ```{r fourth moment gam}
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
@@ -461,3 +470,4 @@ model_caret
 # plot(model_caret$finalModel)
 # summary(model_caret$finalModel)
 ```
+
