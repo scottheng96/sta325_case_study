@@ -5,7 +5,6 @@ date: "10/10/2020"
 output: pdf_document
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -20,6 +19,7 @@ library(MLmetrics)
 library(boot)
 library(splines)
 library(glmnet)
+library(kableExtra)
 ```
 
 ```{r, include=FALSE}
@@ -33,6 +33,8 @@ test$Fr.logit <- inv.logit(test$Fr)
 
 # Introduction
 <!-- outline key research objectives and how your model achieves such objectives -->
+
+## Background Information
 
 Turbulence is  highly versatile motion that is often times difficult to predict and understanding
 fluid motion and its effect on natural problems poses a great challenge.
@@ -54,6 +56,53 @@ of the moments.
 
 2. Investigate and interpret how model parameters affects the probability 
 distribution for particle cluster volumes
+
+## Data
+
+The data set procured for this case study consists of information about cluster volumes. In total, it contains 89 observations with 7 variables. Details of each variable is specified in Table 1.1. The original response variable, a probability distribution for particle cluster volumes, is difficult to interpret, and therefore is summarized into its first 4 raw moments.
+
+```{r, echo=FALSE, warning=FALSE}
+features_tbl <- data.frame(
+  Metric = c(rep("St", 1),
+             rep("Re", 1),
+             rep("Fr",1),
+             rep("R moment 1",1),
+             rep("R moment 2",1),
+             rep("R moment 3",1),
+             rep("R moment 4",1)),
+  
+  Value = c("0 < St < 3",
+            "90, 224, 398",
+            "Infinity, 0, 3",
+            "Continuous response variable",
+            "Continuous response variable",
+            "Continuous response variable",
+            "Continuous response variable"),
+    Description = linebreak(c("Particle property: effect on inertia (e.g. size, density)",
+                       "Reynolds Number: turbulent flow property",
+                       "Particle propety: gravitational acceleration",
+                       "First raw moment of probability distribution",
+                       "Second raw moment of volume probability distribution",
+                       "Third raw moment of volume probability distribution",
+                       "Fourth raw moment of volume probability distribution")
+  )
+)
+features_tbl %>% 
+  kable(escape=F,   booktabs = T, align = "c",
+        caption = "Table 1.1 Description Table of Data set variables") %>%
+  kable_styling(latex_options = c("hold_position")) %>% 
+  collapse_rows(columns = 1, latex_hline = "major") %>% 
+  row_spec(0, bold = TRUE) #%>% 
+#column_spec(column = c(2), latex_column_spec = "c")
+```
+
+Performing some exploratory data analysis, we can observe from Figure 1 that $St$, with the exception of the 0 values, follow a linear relationship with the first moment, while for $Re$, there is high variability for the first moment when $Re$ = 90, and low variability otherwise. There is high variability across all $Fr$ values with respect to the first moment. Some of these insights influenced our decisions for modelling approaches which will be further discussed in the Methods section.
+
+```{r, echo=FALSE, warning= FALSE, fig.width=13, fig.height=3.5, fig.align='center', fig.cap="Exploratory data analysis plots on predictors vs first moment"}
+#plots of each predictor variable with moment 1 (can be changed to other moments)
+gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
+```
+
 
 # Methodology
 <!-- describes your statistical model, how your model is fit from data, and justifying why your model is appropriate given the problem or dataset -->
@@ -308,3 +357,4 @@ gam2 <- lm(R_moment_2 ~ ns(St, 2) + ns(Re, 2) + ns(Fr.logit, 2), data = train, s
 preds <- predict(gam2, newdata = as.data.frame(x[test,]))
 mean((preds - y.test)^2)
 ```
+
