@@ -44,7 +44,7 @@ test$R_moment_2_predict <- predict(model2, newdata = test)
 test$R_moment_3_predict <- predict(model3, newdata = test)
 test$R_moment_4_predict <- predict(model4, newdata = test)
 
-write.csv(test, "/Users/josephchoo/Desktop/data-test-predict.csv")
+#write.csv(test, wherever)
 ```
 
 
