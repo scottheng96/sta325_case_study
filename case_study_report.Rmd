@@ -131,18 +131,14 @@ Moment_x = \beta_0 + \beta_1*St + \sum_{i=2}^{4}\beta_i*Re_i + \sum_{j=5}^{7}\be
 \text{For }   1 \leq x \leq 4, \\
 \end{aligned}
 $$
-<<<<<<< HEAD
-=======
 
-Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
->>>>>>> d8069f6a5062f4d8faad38f7c9ae2c4e3f8b62fb
 
-Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthmore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
+Considering the nature of our response variables, since each moment is derived from the same probability distribution, we decided to perform log transformations for the higher-order moments ($Moment_2$, $Moment_3$ and $Moment_4$). Furthermore, our design decision to include interaction effects stem from the exploratory data plot showing certain correlations between the predictor variables, so as to allow our model to be more interpretable to the collinearity between pair of predictors. It is important to note that the baseline level for the now categorical variable `Fr.logit` is 0.51, whereas the baseline level for the categorical variable `Re` is 90 in all of our models.
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
 
-For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between Fr and Re to be significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. There Residual Mean-squared Error is 1.237, which is low, meaning that the model is fit well. Holding all else constant, a unit increase in St results in a e^(0.8586) increase of the second moment. When Fr is 0.574 and 1, there is a e^(-6.678) and e^(-6.737) change of the second moment respectively. Similar when Re is 224 and 398, there is a e^(-7.43451) and e^(-10.7873) change of the second moment respectively. Additionally, when Fr is 0.574 and Re is 224 and 398, there is a e^(4.477) change in the second moment. When Fr is 1, and Re is 224 and 398, there an additional e^(4.694) and e^(6.883) change in the second moment.
+For the model implemented with the log of the second moment as the response variable, we see that all predictor variables and the interaction effects between `Fr` and `Re` to be significant (p-values <0.05). A high adjusted R-squared value of 0.889 shows that the model explains a large amount of variability in its predictions considering multiple predictors and their collinearity. There Residual Mean-squared Error is 1.237, which is low, meaning that the model is fit well. Holding all else constant, a unit increase in `St` results in a e^(0.8586) increase of the second moment. When `Fr` is 0.574 and 1, there is a e^(-6.678) and e^(-6.737) change of the second moment respectively. Similar when `Re` is 224 and 398, there is a e^(-7.43451) and e^(-10.7873) change of the second moment respectively. Additionally, when `Fr` is 0.574 and `Re` is 224 and 398, there is a e^(4.477) change in the second moment. When `Fr` is 1, and `Re` is 224 and 398, there an additional e^(4.694) and e^(6.883) change in the second moment.
 
 ```{r mom3 final, eval = F}
 set.seed(1)
@@ -503,7 +499,7 @@ mean((preds - y.test)^2)
 lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
 ```
 
-```{r as factor cross validation}
+```{r as factor cross validation1}
 set.seed(1)
 
 data_ctrl <- trainControl(method = "cv", number = 5)
