@@ -253,6 +253,17 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
 model_caret
 plot(model_caret$finalModel)
 summary(model_caret$finalModel)
+
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret_2 <- train(R_moment_2 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret_2
+plot(model_caret_2$finalModel)
+summary(model_caret_2$finalModel)
 ```
 
 #### Ridge Regression 
@@ -402,7 +413,7 @@ mean((preds - y.test)^2)
 
 #### Fourth moment
 
-```{r second moment gam}
+```{r second moment gam pt2}
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
 test <- (-train.samp)
