@@ -29,6 +29,10 @@ test <- read.csv(file='data-test.csv')
 train <- read.csv(file='data-train.csv')
 train$Fr.logit <- inv.logit(train$Fr)
 test$Fr.logit <- inv.logit(test$Fr)
+
+train1 <- train
+train1$Re <- as.factor(train$Re)
+train1$Fr.logit <- as.factor(train$Fr.logit)
 ```
 
 <!-- Paper -->
@@ -113,6 +117,35 @@ gridExtra::grid.arrange(st_m1,re_m1,fr_m1, ncol=3)
 
 # Results
 <!-- discussing your predictive results (don't forget uncertainty!), as well as insights on the scientific problem. You should also submit your predictions on the hold-out set in data-test.csv, in the form of a .csv file-->
+
+```{r mom3 final}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+plot(model_caret$finalModel)
+summary(model_caret$finalModel)
+```
+
+```{r mom4 final}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+# plot(model_caret$finalModel)
+# summary(model_caret$finalModel)
+```
+
 
 # Conclusion
 <!-- summarizing key findings of your study -->
@@ -400,15 +433,31 @@ preds <- predict(gam2, newdata = as.data.frame(x[test,]))
 mean((preds - y.test)^2)
 ```
 
-#### Fourth moment
-
-```{r second moment gam}
+```{r fourth moment gam}
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
 test <- (-train.samp)
-y.test <- train$R_moment_2[test]
+y.test <- train$R_moment_4[test]
 
 gam4 <- lm(R_moment_4 ~ ns(St, 2) + ns(Re, 2) + ns(Fr.logit, 2), data = train, subset = train.samp)
 preds <- predict(gam4, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
+```
+
+```{r}
+lm4_m1_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1)
+```
+
+```{r as factor cross validation}
+set.seed(1)
+
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+# plot(model_caret$finalModel)
+# summary(model_caret$finalModel)
 ```
