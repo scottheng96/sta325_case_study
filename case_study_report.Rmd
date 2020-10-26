@@ -192,6 +192,10 @@ plot(model_caret$finalModel)
 ```
 
 
+
+
+
+
 #### Interaction effects
 
 ```{r, include=FALSE}
@@ -226,8 +230,10 @@ model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
 
-model_caret
+summary(model_caret)
 ```
+
+
 
 #### Predictors as factors
 
@@ -277,7 +283,18 @@ model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*R
 model_caret_2
 plot(model_caret_2$finalModel)
 summary(model_caret_2$finalModel)
+
 ```
+
+The model’s coefficients are all negative except the St and Fr.logit:Re 
+coefficients, which align with our prior beliefs. A larger particle size could 
+increase the probability distribution for particle cluster volumes. Further, 
+the coefficients of significance are St, Re and their interaction.
+
+The R-squared value of 0.6883 shows  the factors in the model successfully 
+explain the most of the variance.
+
+
 
 #### Ridge Regression 
 
