@@ -116,31 +116,29 @@ p4 <- predict.lm(lm_m4, data=test)
 ```
 
 #### Interaction effects
+
 ```{r, include=FALSE}
 #linear regression (continued) -interaction effects
-lm_m1_int <- lm(R_moment_1 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
-lm_m2_int <- lm(R_moment_2 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
-lm_m3_int <- lm(R_moment_3 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
-lm_m4_int <- lm(R_moment_4 ~ St + Fr + Re + St*Fr + St*Re + Fr*Re, data=train_noinf)
+lm_m1_int <- lm(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
+lm_m2_int <- lm(R_moment_2 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
+lm_m3_int <- lm(R_moment_3 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
+lm_m4_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
 
 summary(lm_m1_int)
 summary(lm_m2_int)
 summary(lm_m3_int)
 summary(lm_m4_int)
+```
 
+```{r}
 x <- model.matrix(R_moment_1~St + Fr.logit + Re,data=train)[,-1]
-
-lm_m1_int <- lm(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
-lm_m2_int <- lm(R_moment_2 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
-lm_m3_int <- lm(R_moment_3 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
-lm_m4_int <- lm(R_moment_4 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train)
 
 set.seed(17)
 train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
 test <- (-train.samp)
 y.test <- train$R_moment_1[test]
 
-preds <- predict(lm_m1_int, newdata = as.data.frame(x[test,]))
+preds <- predict(lm_m1_int, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
 ```
 
@@ -150,43 +148,51 @@ mean((preds - y.test)^2)
 #linear regression with factored Re and Fr
 train1 <- train
 train1$Re <- as.factor(train$Re)
-train1$Fr <- as.factor(train$Fr)
-lm1_m1 <- lm(R_moment_1 ~ St + Fr + Re, data=train1)
-lm2_m1 <- lm(R_moment_2 ~ St + Fr + Re, data=train1)
-lm3_m1 <- lm(R_moment_3 ~ St + Fr + Re, data=train1)
-lm4_m1 <- lm(R_moment_4 ~ St + Fr + Re, data=train1)
+train1$Fr.logit <- as.factor(train$Fr.logit)
+lm1_m1 <- lm(R_moment_1 ~ St + Fr.logit + Re, data=train1)
+lm2_m1 <- lm(R_moment_2 ~ St + Fr.logit + Re, data=train1)
+lm3_m1 <- lm(R_moment_3 ~ St + Fr.logit + Re, data=train1)
+lm4_m1 <- lm(R_moment_4 ~ St + Fr.logit + Re, data=train1)
 summary(lm1_m1)
+
+set.seed(17)
+train.samp <- sample(1:nrow(train), 4 * nrow(train)/5)
+test <- (-train.samp)
+y.test <- train$R_moment_1[test]
+
+preds <- predict(lm1_m1, newdata = as.data.frame(train1[test,]))
+mean((preds - y.test)^2)
 ```
 
 #### Ridge Regression 
 
 ```{r moment1 ridge}
-x <- model.matrix(R_moment_1~St + Fr + Re,data=train_noinf)[,-1]
-y <- train_noinf$R_moment_1 
+x <- model.matrix(R_moment_1~St + Fr.logit + Re,data=train)[,-1]
+y <- train$R_moment_1 
 
 set.seed(17)
-train <- sample(1:nrow(x), nrow(x)/2)
-test <- (-train)
-y.test <- y[test]
+train.samp <- sample(1:nrow(x), nrow(x)/2)
+test.samp <- (-train.samp)
+y.test <- y[test.samp]
 
 grid <- 10^seq(10, -2, length = 100) # grid of values for lambda param
 
-ridge.mod <- glmnet(x[train,], y[train], alpha = 0, lambda = grid, thresh = 1e-12)
-ridge.pred <- predict(ridge.mod, s=0, x = x[train,], y = y[train],
-                      newx = x[test,], exact = T)
+ridge.mod <- glmnet(x[train.samp,], y[train.samp], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred <- predict(ridge.mod, s=0, x = x[train.samp,], y = y[train.samp],
+                      newx = x[test.samp,], exact = T)
 mean((ridge.pred - y.test)^2) ## calculate MSE
 ```
 
 ```{r}
 set.seed(1)
-cv.out <- cv.glmnet(x[train,], y[train], alpha = 0)
+cv.out <- cv.glmnet(x[train.samp,], y[train.samp], alpha = 0)
 plot(cv.out)
 bestlam <- cv.out$lambda.min
 bestlam
 ```
 
 ```{r ridge with best lam}
-ridge.pred <- predict(ridge.mod, s = bestlam, newx = x[test,])
+ridge.pred <- predict(ridge.mod, s = bestlam, newx = x[test.samp,])
 mean((ridge.pred - y.test)^2)
 ```
 MSE stays basically the same
