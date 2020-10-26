@@ -20,6 +20,8 @@ library(boot)
 library(splines)
 library(glmnet)
 library(kableExtra)
+library(caret)
+library(psych)
 ```
 
 ```{r, include=FALSE}
@@ -164,6 +166,18 @@ p3 <- predict.lm(lm_m3, data=test)
 p4 <- predict.lm(lm_m4, data=test)
 ```
 
+```{r lm cross validation}
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(R_moment_1 ~ St + Fr.logit + Re, data=train,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+plot(model_caret$finalModel)
+```
+
+
 #### Interaction effects
 
 ```{r, include=FALSE}
@@ -191,6 +205,16 @@ preds <- predict(lm_m1_int, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
 ```
 
+```{r interaction cross validation}
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+```
+
 #### Predictors as factors
 
 ```{r}
@@ -211,6 +235,19 @@ y.test <- train$R_moment_1[test]
 
 preds <- predict(lm1_m1, newdata = as.data.frame(train1[test,]))
 mean((preds - y.test)^2)
+```
+
+```{r as factor cross validation}
+set.seed(1)
+data_ctrl <- trainControl(method = "cv", number = 5)
+model_caret <- train(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+                     trControl = data_ctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)
+
+model_caret
+plot(model_caret$finalModel)
+summary(model_caret$finalModel)
 ```
 
 #### Ridge Regression 
