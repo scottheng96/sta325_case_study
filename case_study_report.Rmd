@@ -334,13 +334,21 @@ summary(model_caret_2$finalModel)
 confint(model_caret_2$finalModel, level=0.95)
 ```
 
-The model’s coefficients are all negative except the St and Fr.logit:Re 
-coefficients, which align with our prior beliefs. A larger particle size could 
+The model’s coefficients align with our prior beliefs. A larger particle size could 
 increase the probability distribution for particle cluster volumes. Further, 
 the coefficients of significance are St, Re and their interaction.
+For every increase one unit increase in St, we expect that the first moment will 
+increase by 0.024313.From this positive value we can conclude that the per probability distribution 
+is increasing as we increase particle size.When `Fr`= 0.5744 and 1, there is an 
+-0.035778 and -0.038679 increase in the first moment. When `Re` = 224 and 398, 
+there is an 0.103060 and -0.106710 increase in the first moment. When when 
+`Fr`=0.5744, and `Re` = 224 there is an 0.028831 icrease in the first moment
+When `Fr` = 1, and `Re` = 224 and 398, there is an  0.033657 and 0.034294 
+increase in the first moment.The R-squared value of 0.9892 shows  the factors 
+in the model successfully explain the most of the variance.The Residual standard 
+error is 0.006253 which isthe lowest among the models as to be expected as the 
+others have been derived from this model.
 
-The R-squared value of 0.6883 shows  the factors in the model successfully 
-explain the most of the variance.
 
 
 

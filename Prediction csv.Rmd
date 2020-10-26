@@ -1,0 +1,54 @@
+---
+title: "Prediction CSV Document"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(corrplot)
+library(gridExtra)
+library(reshape2)
+library(MLmetrics)
+library(boot)
+library(splines)
+library(glmnet)
+library(kableExtra)
+library(caret)
+library(psych)
+```
+
+```{r, include=FALSE}
+test <- read.csv(file='data-test.csv')
+train <- read.csv(file='data-train.csv')
+train$Fr.logit <- inv.logit(train$Fr)
+test$Fr.logit <- inv.logit(test$Fr)
+
+train$Re <- as.factor(train$Re)
+train$Fr.logit <- as.factor(train$Fr.logit)
+test$Re <- as.factor(test$Re)
+test$Fr.logit <- as.factor(test$Fr.logit)
+```
+
+```{r}
+model <- lm(R_moment_1 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re , data = train)
+
+model2 <- lm(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re , data = train)
+
+model3<- lm(log(R_moment_3) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re , data = train)
+
+model4 <- lm(log(R_moment_4) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re , data = train)
+
+test$R_moment_1_predict <- predict(model, newdata = test)
+test$R_moment_2_predict <- predict(model2, newdata = test)
+test$R_moment_3_predict <- predict(model3, newdata = test)
+test$R_moment_4_predict <- predict(model4, newdata = test)
+
+#write.csv(test, wherever)
+```
+
+
+
+
+
+
