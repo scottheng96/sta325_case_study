@@ -255,8 +255,7 @@ plot(model_caret$finalModel)
 summary(model_caret$finalModel)
 
 
-data_ctrl <- trainControl(method = "cv", number = 5)
-model_caret_2 <- train(R_moment_2 ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
+model_caret_2 <- train(log(R_moment_2) ~ St + Fr.logit + Re + St*Fr.logit + St*Re + Fr.logit*Re, data=train1,                       
                      trControl = data_ctrl,              # folds
                      method = "lm",                      # specifying regression model
                      na.action = na.pass)
@@ -423,3 +422,4 @@ gam4 <- lm(R_moment_4 ~ ns(St, 2) + ns(Re, 2) + ns(Fr.logit, 2), data = train, s
 preds <- predict(gam4, newdata = as.data.frame(train[test,]))
 mean((preds - y.test)^2)
 ```
+
